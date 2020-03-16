@@ -4,27 +4,41 @@ import Header from './components/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from './logo.svg';
 import './App.css';
+import Axios from 'axios'; 
 
 class App extends Component {
-  componentWillMount() {
-    document.querySelector('body').addEventListener("click", this.handleElement, false);
-  }
-  componentWillUnmount() {
-    document.querySelector('body').removeEventListener("click", this.handleElement, false);
-  }
-  handleElement(e) {
-     console.log(e.target.innerText);
-     e.target.innerText = "Deleted";
-  };
+  constructor(props){
+    super(props)
+    this.state = {
+      search_title:[
+       
+      ]
+    }
 
-  saveHandling(){
-    console.log(document.getElementById("Main"));
+  }
+  search = (keyword) => {
+    console.log(keyword.target.value)
+    var dataArray = []
+    var url = 'https://api.themoviedb.org/3/search/movie?api_key=4daf72941f283dd6442f445176f6ea77&language=th&page=1&query='
+    if(keyword.target.value==''){
+      this.setState({search_title:[]})
 
+
+    }else{
+        Axios.get(url+keyword.target.value).then(result=>{
+        console.log(result.data);
+        result.data.results.forEach(element => {
+          dataArray.push(element)
+          
+        });
+        this.setState({search_title:dataArray})
+      })
+
+    }
   }
   render() {
     return (
       <div className="App">
-      <Button onClick={this.saveHandling}>Save</Button>
         <div id="Main">
         <Nav>
         <Nav.Item>
@@ -32,7 +46,12 @@ class App extends Component {
         </Nav.Item>
         
       </Nav>
-      <Header></Header>
+      <input onChange={this.search}/>
+      {this.state.search_title.map(item=>(
+         
+         <div key={item.id}><strong>{item.original_title} {item.title}</strong></div>
+      ))}
+      {/* <Header></Header> */}
       <Jumbotron>
       <h1>Hello, world!</h1>
       <p>
